@@ -214,17 +214,28 @@ function generateStandaloneHTML(config: WidgetConfig): string {
 
         <!-- Success & Review Screen (Always safe in DOM, hidden until completion) -->
         <div id="success-screen" class="hidden bg-emerald-50 border border-emerald-100 p-6 rounded-2xl space-y-4 transition-all duration-500">
-            <div class="flex items-center gap-3">
-                <div class="bg-emerald-500 text-white p-2 rounded-full shadow-md shadow-emerald-200 flex-shrink-0">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+            <div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+                <div class="flex items-center gap-3 min-w-0">
+                    <div class="bg-emerald-500 text-white p-2 rounded-full shadow-md shadow-emerald-200 flex-shrink-0">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path>
+                        </svg>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-sm text-emerald-900 font-semibold leading-relaxed" id="global-explanation">
+                            ${showSuccessMsg && config.globalExplanation ? config.globalExplanation : 'Parabéns! Você completou todas as correspondências corretamente!'}
+                        </p>
+                    </div>
+                </div>
+                <button type="button" onclick="resetQuiz()" class="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer bg-transparent border-0 py-1.5 px-2.5 rounded-lg hover:bg-emerald-100/60 flex-shrink-0" title="Reiniciar Atividade">
+                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                        <path d="M3 3v5h5"/>
+                        <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                        <path d="M16 16h5v5"/>
                     </svg>
-                </div>
-                <div class="min-w-0 flex-1">
-                    <p class="text-sm text-emerald-900 font-semibold leading-relaxed" id="global-explanation">
-                        ${showSuccessMsg && config.globalExplanation ? config.globalExplanation : 'Parabéns! Você completou todas as correspondências corretamente!'}
-                    </p>
-                </div>
+                    Reiniciar Atividade
+                </button>
             </div>
             
             ${showReview ? `
@@ -236,9 +247,15 @@ function generateStandaloneHTML(config: WidgetConfig): string {
         </div>
 
         <!-- Actions -->
-        <div class="flex items-center justify-between pt-4 border-t border-slate-100">
-            <button type="button" onclick="resetQuiz()" class="px-6 py-3 border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white hover:bg-slate-50 cursor-pointer shadow-xs">
-                🔄 Reiniciar Atividade
+        <div class="flex items-center justify-end pt-3 border-t border-slate-100">
+            <button type="button" onclick="resetQuiz()" class="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer bg-transparent border-0 py-1.5 px-3 rounded-lg hover:bg-slate-100" title="Reiniciar Atividade">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/>
+                    <path d="M3 3v5h5"/>
+                    <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/>
+                    <path d="M16 16h5v5"/>
+                </svg>
+                Reiniciar Atividade
             </button>
         </div>
     </div>
@@ -1491,29 +1508,38 @@ export default function App() {
 
                 {/* Congratulations section on completion */}
                 <AnimatePresence>
-                  {isComplete && showSuccessMsg && (
+                  {isComplete && (
                     <motion.div 
                       key="success"
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
                       className="bg-emerald-50 border border-emerald-100 p-5 rounded-2xl space-y-4"
                     >
-                      <div className="flex items-center gap-3">
-                        <div className="bg-emerald-500 text-white p-1.5 rounded-full flex-shrink-0 shadow-xs">
-                          <CheckCircle2 size={18} />
-                        </div>
-                        {showSuccessMsg && config.globalExplanation && (
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0">
+                          <div className="bg-emerald-500 text-white p-1.5 rounded-full flex-shrink-0 shadow-xs">
+                            <CheckCircle2 size={18} />
+                          </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs text-emerald-900 font-semibold leading-relaxed">
-                              {config.globalExplanation}
+                              {showSuccessMsg && config.globalExplanation ? config.globalExplanation : 'Parabéns! Atividade concluída com sucesso!'}
                             </p>
                           </div>
-                        )}
+                        </div>
+
+                        {/* Discreet grey restart button */}
+                        <button
+                          onClick={resetWidget}
+                          className="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0 py-1 px-2 rounded-lg hover:bg-emerald-100/60"
+                          title="Reiniciar Atividade"
+                        >
+                          <RefreshCw size={12} /> Reiniciar Atividade
+                        </button>
                       </div>
 
                       {/* Summary recap list */}
                       {showReview && (
-                        <div className="space-y-2 pt-1">
+                        <div className="space-y-2 pt-1 border-t border-emerald-100/60">
                           <p className="text-[10px] font-extrabold text-emerald-800 uppercase tracking-wider">Revisão Didática:</p>
                           <div className="space-y-2 max-h-[160px] overflow-y-auto pr-1">
                             {config.items.map((item, idx) => (
@@ -1737,27 +1763,36 @@ export default function App() {
 
               {/* Completion block in Fullscreen */}
               <AnimatePresence>
-                {isComplete && showSuccessMsg && (
+                {isComplete && (
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     className="bg-emerald-50 border border-emerald-100 p-6 rounded-2xl space-y-4"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="bg-emerald-500 text-white p-2 rounded-full shadow-md shadow-emerald-200 flex-shrink-0">
-                        <CheckCircle2 size={24} />
-                      </div>
-                      {showSuccessMsg && config.globalExplanation && (
+                    <div className="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="bg-emerald-500 text-white p-2 rounded-full shadow-md shadow-emerald-200 flex-shrink-0">
+                          <CheckCircle2 size={24} />
+                        </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm text-emerald-900 font-semibold leading-relaxed">
-                            {config.globalExplanation}
+                            {showSuccessMsg && config.globalExplanation ? config.globalExplanation : 'Parabéns! Atividade concluída com sucesso!'}
                           </p>
                         </div>
-                      )}
+                      </div>
+
+                      {/* Discreet grey restart button */}
+                      <button
+                        onClick={resetWidget}
+                        className="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0 py-1.5 px-3 rounded-lg hover:bg-emerald-100/60"
+                        title="Reiniciar Atividade"
+                      >
+                        <RefreshCw size={13} /> Reiniciar Atividade
+                      </button>
                     </div>
 
                     {showReview && (
-                      <div className="space-y-2">
+                      <div className="space-y-2 pt-1 border-t border-emerald-100/60">
                         <h5 className="text-xs font-bold text-emerald-800 uppercase tracking-wider">Revisão Didática:</h5>
                         <div className="grid sm:grid-cols-2 gap-2">
                           {config.items.map((item, idx) => (
