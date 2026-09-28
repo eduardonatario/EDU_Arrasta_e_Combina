@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="rerShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0284c7" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <!-- Retículo Endoplasmático - Tubos e cisternas interconectadas -->
+  <path d="M 30,50 Q 80,35 130,55 T 170,95 Q 160,135 120,150 T 40,140 Q 25,100 30,50 Z" 
+        fill="url(#rerGrad)" stroke="#0369a1" stroke-width="3" filter="url(#rerShadow)"/>
+  <path d="M 45,70 Q 90,55 135,75 T 150,115" fill="none" stroke="#e0f2fe" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 50,100 Q 85,90 120,105 T 140,135" fill="none" stroke="#e0f2fe" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 55,125 Q 90,120 125,130" fill="none" stroke="#bae6fd" stroke-width="3" stroke-linecap="round"/>
+  <!-- Ribossomos aderidos (RER) -->
+  <circle cx="50" cy="65" r="2.5" fill="#f59e0b"/>
+  <circle cx="70" cy="58" r="2.5" fill="#f59e0b"/>
+  <circle cx="95" cy="60" r="2.5" fill="#f59e0b"/>
+  <circle cx="120" cy="68" r="2.5" fill="#f59e0b"/>
+  <circle cx="140" cy="85" r="2.5" fill="#f59e0b"/>
+  <circle cx="152" cy="105" r="2.5" fill="#f59e0b"/>
+  <circle cx="60" cy="95" r="2.5" fill="#f59e0b"/>
+  <circle cx="85" cy="88" r="2.5" fill="#f59e0b"/>
+  <circle cx="110" cy="98" r="2.5" fill="#f59e0b"/>
+  <circle cx="65" cy="118" r="2.5" fill="#f59e0b"/>
+  <circle cx="95" cy="115" r="2.5" fill="#f59e0b"/>
+</svg>

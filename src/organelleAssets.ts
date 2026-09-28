@@ -246,3 +246,144 @@ export const GOLGI_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
   <circle cx="100" cy="180" r="6" fill="#e9d5ff" stroke="#7e22ce" stroke-width="1.5"/>
 </svg>
 `)}`;
+
+export const RETICULO_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#0284c7"/>
+    </linearGradient>
+    <filter id="rerShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#0284c7" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <path d="M 30,50 Q 80,35 130,55 T 170,95 Q 160,135 120,150 T 40,140 Q 25,100 30,50 Z" 
+        fill="url(#rerGrad)" stroke="#0369a1" stroke-width="3" filter="url(#rerShadow)"/>
+  <path d="M 45,70 Q 90,55 135,75 T 150,115" fill="none" stroke="#e0f2fe" stroke-width="4" stroke-linecap="round"/>
+  <path d="M 50,100 Q 85,90 120,105 T 140,135" fill="none" stroke="#e0f2fe" stroke-width="3.5" stroke-linecap="round"/>
+  <path d="M 55,125 Q 90,120 125,130" fill="none" stroke="#bae6fd" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="50" cy="65" r="2.5" fill="#f59e0b"/>
+  <circle cx="70" cy="58" r="2.5" fill="#f59e0b"/>
+  <circle cx="95" cy="60" r="2.5" fill="#f59e0b"/>
+  <circle cx="120" cy="68" r="2.5" fill="#f59e0b"/>
+  <circle cx="140" cy="85" r="2.5" fill="#f59e0b"/>
+  <circle cx="152" cy="105" r="2.5" fill="#f59e0b"/>
+  <circle cx="60" cy="95" r="2.5" fill="#f59e0b"/>
+  <circle cx="85" cy="88" r="2.5" fill="#f59e0b"/>
+  <circle cx="110" cy="98" r="2.5" fill="#f59e0b"/>
+  <circle cx="65" cy="118" r="2.5" fill="#f59e0b"/>
+  <circle cx="95" cy="115" r="2.5" fill="#f59e0b"/>
+</svg>
+`)}`;
+
+export const LISOSSOMO_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <radialGradient id="lisoGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="60%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#9f1239"/>
+    </radialGradient>
+    <filter id="lisoShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#9f1239" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <circle cx="100" cy="100" r="75" fill="url(#lisoGrad)" stroke="#881337" stroke-width="4" filter="url(#lisoShadow)"/>
+  <circle cx="100" cy="100" r="67" fill="none" stroke="#fecdd3" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.6"/>
+  <circle cx="80" cy="80" r="8" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+  <circle cx="120" cy="85" r="7" fill="#fb923c" stroke="#c2410c" stroke-width="1.5"/>
+  <circle cx="95" cy="120" r="9" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+  <circle cx="70" cy="115" r="6" fill="#a7f3d0" stroke="#059669" stroke-width="1.5"/>
+  <circle cx="130" cy="115" r="6.5" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+  <circle cx="105" cy="65" r="5" fill="#fb923c" stroke="#c2410c" stroke-width="1.5"/>
+  <circle cx="100" cy="95" r="4.5" fill="#a7f3d0" stroke="#059669" stroke-width="1"/>
+</svg>
+`)}`;
+
+export const VACUOLO_SVG = `data:image/svg+xml;utf8,${encodeURIComponent(`
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <radialGradient id="vacGrad" cx="35%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#a7f3d0"/>
+      <stop offset="50%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </radialGradient>
+    <filter id="vacShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#059669" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  <path d="M 50,70 C 35,110 50,150 90,165 C 130,175 165,145 160,105 C 155,60 120,40 85,50 C 65,55 55,60 50,70 Z" 
+        fill="url(#vacGrad)" stroke="#047857" stroke-width="3.5" filter="url(#vacShadow)"/>
+  <path d="M 70,75 C 60,95 70,120 90,130" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.6"/>
+  <circle cx="125" cy="90" r="10" fill="#ffffff" opacity="0.2"/>
+  <circle cx="105" cy="130" r="7" fill="#ffffff" opacity="0.15"/>
+</svg>
+`)}`;
+
+export interface BuiltinPresetImage {
+  id: string;
+  name: string;
+  svgDataUri: string;
+  relativePath: string;
+  defaultExplanation: string;
+}
+
+export const BUILTIN_IMAGE_PRESETS: BuiltinPresetImage[] = [
+  {
+    id: 'mitocondria',
+    name: 'Mitocôndria',
+    svgDataUri: MITOCONDRIA_SVG,
+    relativePath: './images/mitocondria.svg',
+    defaultExplanation: 'Usina de energia celular. Responsável pela respiração celular e síntese de ATP para abastecer todo o metabolismo celular.',
+  },
+  {
+    id: 'cloroplasto',
+    name: 'Cloroplasto',
+    svgDataUri: CLOROPLASTO_SVG,
+    relativePath: './images/cloroplasto.svg',
+    defaultExplanation: 'Centro de fotossíntese. Presente em células vegetais e algas, capta a energia luminosa solar para produzir glicose e oxigênio.',
+  },
+  {
+    id: 'nucleo',
+    name: 'Núcleo Celular',
+    svgDataUri: NUCLEO_SVG,
+    relativePath: './images/nucleo.svg',
+    defaultExplanation: 'Diretoria de controle celular. Contém o DNA genômico e coordena o crescimento, reprodução celular e a transcrição gênica.',
+  },
+  {
+    id: 'ribossomo',
+    name: 'Ribossomo',
+    svgDataUri: RIBOSSOMO_SVG,
+    relativePath: './images/ribossomo.svg',
+    defaultExplanation: 'Fábrica de proteínas. Traduz as informações genéticas do RNA mensageiro em sequências de aminoácidos vitais.',
+  },
+  {
+    id: 'golgi',
+    name: 'Complexo de Golgi',
+    svgDataUri: GOLGI_SVG,
+    relativePath: './images/golgi.svg',
+    defaultExplanation: 'Centro de distribuição celular. Modifica, separa, empacota e direciona proteínas e vesículas para secreção ou uso interno.',
+  },
+  {
+    id: 'reticulo',
+    name: 'Retículo Endoplasmático',
+    svgDataUri: RETICULO_SVG,
+    relativePath: './images/reticulo.svg',
+    defaultExplanation: 'Rede de síntese e transporte de substâncias essenciais como proteínas (RER) e lipídios (REL).',
+  },
+  {
+    id: 'lisossomo',
+    name: 'Lisossomo',
+    svgDataUri: LISOSSOMO_SVG,
+    relativePath: './images/lisossomo.svg',
+    defaultExplanation: 'Estômago da célula. Realiza a digestão intracelular e reciclagem de componentes desgastados (autofagia).',
+  },
+  {
+    id: 'vacuolo',
+    name: 'Vacúolo',
+    svgDataUri: VACUOLO_SVG,
+    relativePath: './images/vacuolo.svg',
+    defaultExplanation: 'Reservatório celular. Armazena água, íons e pigmentos, além de regular a pressão osmótica e turgidez vegetal.',
+  },
+];

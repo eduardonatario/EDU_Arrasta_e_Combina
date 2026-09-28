@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="largeSubunit" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="smallSubunit" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047"/>
+      <stop offset="100%" stop-color="#eab308"/>
+    </linearGradient>
+    <filter id="riboShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#d97706" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- mRNA Strand passing through -->
+  <path d="M 20,118 Q 60,110 100,122 T 180,115" fill="none" stroke="#ec4899" stroke-width="5" stroke-linecap="round"/>
+  <!-- mRNA Codons (nucleotides) -->
+  <line x1="35" y1="113" x2="35" y2="120" stroke="#db2777" stroke-width="3"/>
+  <line x1="55" y1="110" x2="55" y2="117" stroke="#db2777" stroke-width="3"/>
+  <line x1="75" y1="113" x2="75" y2="120" stroke="#db2777" stroke-width="3"/>
+  <line x1="95" y1="118" x2="95" y2="125" stroke="#db2777" stroke-width="3"/>
+  <line x1="120" y1="117" x2="120" y2="124" stroke="#db2777" stroke-width="3"/>
+  <line x1="145" y1="114" x2="145" y2="121" stroke="#db2777" stroke-width="3"/>
+  <line x1="165" y1="112" x2="165" y2="119" stroke="#db2777" stroke-width="3"/>
+
+  <!-- Growing polypeptide (Protein Chain) exiting the top -->
+  <path d="M 100,45 Q 92,30 105,20 T 115,10" fill="none" stroke="#8b5cf6" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="100" cy="45" r="4.5" fill="#a855f7"/>
+  <circle cx="95" cy="33" r="4.5" fill="#c084fc"/>
+  <circle cx="106" cy="20" r="4.5" fill="#7c3aed"/>
+  <circle cx="115" cy="10" r="4.5" fill="#6d28d9"/>
+
+  <!-- Large Subunit (Crown / Dome shape on top) -->
+  <path d="M 45,108 C 40,75 55,42 90,40 C 110,39 125,48 135,44 C 150,52 165,75 160,108 C 145,112 120,104 100,108 C 80,112 58,105 45,108 Z" 
+        fill="url(#largeSubunit)" stroke="#b45309" stroke-width="3.5" filter="url(#riboShadow)"/>
+
+  <!-- Large subunit features (E, P, A sites groove) -->
+  <ellipse cx="80" cy="85" rx="8" ry="14" fill="#b45309" opacity="0.3"/>
+  <ellipse cx="102" cy="83" rx="8" ry="15" fill="#b45309" opacity="0.35"/>
+  <ellipse cx="124" cy="87" rx="8" ry="13" fill="#b45309" opacity="0.3"/>
+
+  <!-- Small Subunit (Base / Platform below mRNA) -->
+  <path d="M 48,124 C 48,124 55,145 75,155 C 95,165 125,162 145,152 C 158,142 162,126 162,126 C 145,133 125,128 102,130 C 80,132 60,126 48,124 Z" 
+        fill="url(#smallSubunit)" stroke="#ca8a04" stroke-width="3" filter="url(#riboShadow)"/>
+</svg>

@@ -16,7 +16,10 @@ import {
   ChevronDown, 
   ChevronUp, 
   CheckCircle2,
-  Sparkles
+  Sparkles,
+  Image as ImageIcon,
+  Upload,
+  FolderOpen
 } from 'lucide-react';
 import { ItemConfig, WidgetConfig } from './types';
 import { 
@@ -24,7 +27,12 @@ import {
   CLOROPLASTO_SVG, 
   NUCLEO_SVG, 
   RIBOSSOMO_SVG, 
-  GOLGI_SVG 
+  GOLGI_SVG,
+  RETICULO_SVG,
+  LISOSSOMO_SVG,
+  VACUOLO_SVG,
+  BUILTIN_IMAGE_PRESETS,
+  BuiltinPresetImage
 } from './organelleAssets';
 
 // Default biological educational dataset: Organelas Celulares (with 5 tested, 100% reliable SVG illustrations)
@@ -563,9 +571,26 @@ export default function App() {
   const [copiedCode, setCopiedCode] = useState(false);
   const [isFullscreenPreview, setIsFullscreenPreview] = useState(false);
   const [expandedItemIdx, setExpandedItemIdx] = useState<number | null>(0);
+  const [galleryTarget, setGalleryTarget] = useState<{ itemIdx: number; isSource: boolean } | null>(null);
 
   const targetRefs = useRef<(HTMLDivElement | null)[]>([]);
   const fullscreenTargetRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  const handleLocalImageUpload = (index: number, isSource: boolean, file: File) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const result = e.target?.result as string;
+      if (result) {
+        if (isSource) {
+          updateItem(index, { sourceImageUrl: result });
+        } else {
+          updateItem(index, { targetImageUrl: result });
+        }
+      }
+    };
+    reader.readAsDataURL(file);
+  };
 
   // Esc key closes full screen
   useEffect(() => {
@@ -683,12 +708,17 @@ export default function App() {
   const addItem = () => {
     if (config.items.length >= 8) return;
     const newIdx = config.items.length;
+    // Find next unused preset if available
+    const unusedPreset = BUILTIN_IMAGE_PRESETS.find(
+      p => !config.items.some(item => item.name.toLowerCase() === p.name.toLowerCase())
+    ) || BUILTIN_IMAGE_PRESETS[newIdx % BUILTIN_IMAGE_PRESETS.length];
+
     const newItem: ItemConfig = {
       id: `bio-${Date.now()}`,
-      name: `Nova Organela ${newIdx + 1}`,
+      name: unusedPreset ? unusedPreset.name : `Nova Organela ${newIdx + 1}`,
       targetImageUrl: '',
-      sourceImageUrl: MITOCONDRIA_SVG,
-      explanation: 'Insira a explicação pedagógica sobre a função desta estrutura celular aqui.'
+      sourceImageUrl: unusedPreset ? unusedPreset.svgDataUri : MITOCONDRIA_SVG,
+      explanation: unusedPreset ? unusedPreset.defaultExplanation : 'Insira a explicação pedagógica sobre a função desta estrutura celular aqui.'
     };
     setConfig({ ...config, items: [...config.items, newItem] });
     setExpandedItemIdx(newIdx);
@@ -1068,33 +1098,124 @@ export default function App() {
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div className="space-y-1">
-                                    <label className="font-bold text-slate-600">Imagem Colorida (Source)</label>
+                                  {/* Source Image (Color) */}
+                                  <div className="space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                                    <div className="flex items-center justify-between">
+                                      <label className="font-bold text-slate-700 flex items-center gap-1.5">
+                                        <span>Imagem Colorida (Item)</span>
+                                      </label>
+                                      {item.sourceImageUrl && (
+                                        <div className="w-8 h-8 bg-white rounded-lg p-1 border border-slate-200 shadow-2xs flex items-center justify-center flex-shrink-0">
+                                          <img src={item.sourceImageUrl} alt="" className="w-full h-full object-contain" />
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Quick local image action buttons: No external link required! */}
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <button
+                                        type="button"
+                                        onClick={() => setGalleryTarget({ itemIdx: index, isSource: true })}
+                                        className="flex items-center gap-1 px-2.5 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-lg font-bold text-[11px] transition-colors cursor-pointer border border-blue-200/60"
+                                        title="Escolher entre as 8 ilustrações de organelas embutidas no projeto"
+                                      >
+                                        <ImageIcon size={13} />
+                                        <span>Galeria do Projeto</span>
+                                      </button>
+
+                                      <label
+                                        className="flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg font-bold text-[11px] transition-colors cursor-pointer border border-slate-200 shadow-2xs"
+                                        title="Carregar imagem do seu computador (salva localmente no app sem depender da web)"
+                                      >
+                                        <Upload size={13} className="text-slate-500" />
+                                        <span>Carregar do PC</span>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) handleLocalImageUpload(index, true, file);
+                                          }}
+                                        />
+                                      </label>
+                                    </div>
+
                                     <input 
                                       type="text" 
-                                      value={item.sourceImageUrl}
+                                      value={item.sourceImageUrl.startsWith('data:') ? '(Ilustração SVG Integrada no Projeto)' : item.sourceImageUrl}
                                       onChange={(e) => updateItem(index, { sourceImageUrl: e.target.value })}
-                                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl outline-none font-mono text-[10px]"
-                                      placeholder="URL da Imagem ou SVG..."
+                                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-blue-500 rounded-lg outline-none font-mono text-[10px] text-slate-600"
+                                      placeholder="Ou cole uma URL..."
                                     />
                                   </div>
 
-                                  <div className="space-y-1">
-                                    <label className="font-bold text-slate-600 flex items-center gap-1">
-                                      Imagem Sombra (Target)
-                                      <span className="text-[9px] font-medium text-slate-400">(Opcional)</span>
-                                    </label>
+                                  {/* Target Image (Shadow/Alvo) */}
+                                  <div className="space-y-2 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                                    <div className="flex items-center justify-between">
+                                      <label className="font-bold text-slate-700 flex items-center gap-1">
+                                        <span>Imagem Sombra (Alvo)</span>
+                                        <span className="text-[9px] font-medium text-slate-400">(Opcional)</span>
+                                      </label>
+                                      {item.targetImageUrl ? (
+                                        <div className="w-8 h-8 bg-white rounded-lg p-1 border border-slate-200 shadow-2xs flex items-center justify-center flex-shrink-0">
+                                          <img src={item.targetImageUrl} alt="" className="w-full h-full object-contain" />
+                                        </div>
+                                      ) : (
+                                        <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Auto Sombra</span>
+                                      )}
+                                    </div>
+
+                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                      <button
+                                        type="button"
+                                        onClick={() => setGalleryTarget({ itemIdx: index, isSource: false })}
+                                        className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-200/80 hover:bg-slate-200 text-slate-700 rounded-lg font-bold text-[11px] transition-colors cursor-pointer"
+                                        title="Escolher imagem para a silhueta da galeria"
+                                      >
+                                        <ImageIcon size={13} />
+                                        <span>Galeria</span>
+                                      </button>
+
+                                      <label
+                                        className="flex items-center gap-1 px-2.5 py-1.5 bg-white hover:bg-slate-100 text-slate-700 rounded-lg font-bold text-[11px] transition-colors cursor-pointer border border-slate-200 shadow-2xs"
+                                        title="Carregar imagem de silhueta do computador"
+                                      >
+                                        <Upload size={13} className="text-slate-500" />
+                                        <span>Carregar do PC</span>
+                                        <input
+                                          type="file"
+                                          accept="image/*"
+                                          className="hidden"
+                                          onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) handleLocalImageUpload(index, false, file);
+                                          }}
+                                        />
+                                      </label>
+
+                                      {item.targetImageUrl && (
+                                        <button
+                                          type="button"
+                                          onClick={() => updateItem(index, { targetImageUrl: '' })}
+                                          className="text-[10px] text-red-500 hover:underline font-semibold cursor-pointer"
+                                        >
+                                          Limpar
+                                        </button>
+                                      )}
+                                    </div>
+
                                     <input 
                                       type="text" 
-                                      value={item.targetImageUrl}
+                                      value={item.targetImageUrl.startsWith('data:') ? '(Silhueta Integrada no Projeto)' : item.targetImageUrl}
                                       onChange={(e) => updateItem(index, { targetImageUrl: e.target.value })}
-                                      className="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl outline-none font-mono text-[10px]"
+                                      className="w-full px-2.5 py-1.5 bg-white border border-slate-200 focus:border-blue-500 rounded-lg outline-none font-mono text-[10px] text-slate-600"
                                       placeholder="Deixe vazio para auto-sombra cinza"
                                     />
                                   </div>
                                 </div>
                                 <p className="text-[10px] text-slate-400 italic">
-                                  Dica: Se deixar a imagem sombra em branco, convertemos a imagem colorida em sombra automaticamente por filtro CSS.
+                                  Dica: Todas as imagens da galeria e uploads do seu PC ficam salvos no app e no HTML exportado sem precisar de conexão com internet ou servidores externos.
                                 </p>
 
                                 <div className="space-y-1">
@@ -1605,6 +1726,87 @@ export default function App() {
                 )}
               </AnimatePresence>
             </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Built-in Project Image Gallery Modal */}
+      <AnimatePresence>
+        {galleryTarget !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center p-4"
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col"
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div className="flex items-center gap-2.5">
+                  <div className="bg-blue-100 text-blue-700 p-2 rounded-xl">
+                    <ImageIcon size={20} />
+                  </div>
+                  <div>
+                    <h3 className="font-extrabold text-base text-slate-800">Galeria de Imagens do Projeto</h3>
+                    <p className="text-xs text-slate-500">Imagens 100% locais integradas no projeto. Sem dependências externas ou links que expirem.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setGalleryTarget(null)}
+                  className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors cursor-pointer"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 overflow-y-auto py-2 flex-1">
+                {BUILTIN_IMAGE_PRESETS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    onClick={() => {
+                      if (galleryTarget.isSource) {
+                        const currentItem = config.items[galleryTarget.itemIdx];
+                        updateItem(galleryTarget.itemIdx, {
+                          sourceImageUrl: preset.svgDataUri,
+                          name: currentItem?.name.startsWith('Nova Organela') || currentItem?.name.startsWith('Novo Item') ? preset.name : currentItem?.name,
+                          explanation: currentItem?.explanation.startsWith('Insira a explicação') ? preset.defaultExplanation : currentItem?.explanation
+                        });
+                      } else {
+                        updateItem(galleryTarget.itemIdx, { targetImageUrl: preset.svgDataUri });
+                      }
+                      setGalleryTarget(null);
+                    }}
+                    className="flex flex-col items-center p-3 rounded-2xl border border-slate-200 hover:border-blue-500 hover:bg-blue-50/50 transition-all text-center group cursor-pointer"
+                  >
+                    <div className="w-16 h-16 bg-slate-50 group-hover:bg-white rounded-xl flex items-center justify-center p-2 mb-2 border border-slate-100 group-hover:border-blue-200 shadow-2xs">
+                      <img src={preset.svgDataUri} alt={preset.name} className="w-full h-full object-contain" />
+                    </div>
+                    <span className="font-bold text-xs text-slate-800 group-hover:text-blue-600 leading-tight">
+                      {preset.name}
+                    </span>
+                    <span className="text-[10px] text-slate-400 mt-1 line-clamp-1">
+                      SVG Integrado
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="border-t border-slate-100 pt-3 flex justify-between items-center text-xs text-slate-500">
+                <span>Total de 8 ilustrações disponíveis no projeto</span>
+                <button
+                  type="button"
+                  onClick={() => setGalleryTarget(null)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition-colors cursor-pointer"
+                >
+                  Fechar
+                </button>
+              </div>
+            </motion.div>
           </motion.div>
         )}
       </AnimatePresence>

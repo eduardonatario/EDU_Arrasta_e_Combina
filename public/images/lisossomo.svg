@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <radialGradient id="lisoGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#f43f5e"/>
+      <stop offset="60%" stop-color="#e11d48"/>
+      <stop offset="100%" stop-color="#9f1239"/>
+    </radialGradient>
+    <filter id="lisoShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#9f1239" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <!-- Membrana do Lisossomo -->
+  <circle cx="100" cy="100" r="75" fill="url(#lisoGrad)" stroke="#881337" stroke-width="4" filter="url(#lisoShadow)"/>
+  <circle cx="100" cy="100" r="67" fill="none" stroke="#fecdd3" stroke-width="1.5" stroke-dasharray="8 4" opacity="0.6"/>
+  <!-- Enzimas digestivas internas (hidrolases ácidas) -->
+  <circle cx="80" cy="80" r="8" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+  <circle cx="120" cy="85" r="7" fill="#fb923c" stroke="#c2410c" stroke-width="1.5"/>
+  <circle cx="95" cy="120" r="9" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+  <circle cx="70" cy="115" r="6" fill="#a7f3d0" stroke="#059669" stroke-width="1.5"/>
+  <circle cx="130" cy="115" r="6.5" fill="#fde047" stroke="#ca8a04" stroke-width="1.5"/>
+  <circle cx="105" cy="65" r="5" fill="#fb923c" stroke="#c2410c" stroke-width="1.5"/>
+  <circle cx="100" cy="95" r="4.5" fill="#a7f3d0" stroke="#059669" stroke-width="1"/>
+</svg>

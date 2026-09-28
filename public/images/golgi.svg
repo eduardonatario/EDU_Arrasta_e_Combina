@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
+  <defs>
+    <linearGradient id="golgiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a855f7"/>
+      <stop offset="100%" stop-color="#7e22ce"/>
+    </linearGradient>
+    <filter id="golgiShadow" x="-10%" y="-10%" width="130%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#7e22ce" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+  
+  <!-- Stacked Cisternae (Curved flattened membranes) -->
+  <!-- Cisterna 1 -->
+  <path d="M 45,55 C 80,45 120,45 155,55 C 160,56 162,64 156,66 C 122,58 78,58 44,66 C 38,64 40,56 45,55 Z" 
+        fill="url(#golgiGrad)" stroke="#6b21a8" stroke-width="2.5" filter="url(#golgiShadow)"/>
+  
+  <!-- Cisterna 2 -->
+  <path d="M 40,78 C 80,66 120,66 160,78 C 166,80 168,88 161,90 C 123,80 77,80 39,90 C 32,88 34,80 40,78 Z" 
+        fill="url(#golgiGrad)" stroke="#6b21a8" stroke-width="2.5" filter="url(#golgiShadow)"/>
+
+  <!-- Cisterna 3 (Main central curve) -->
+  <path d="M 36,102 C 80,88 120,88 164,102 C 171,104 172,113 164,115 C 122,103 78,103 36,115 C 28,113 29,104 36,102 Z" 
+        fill="url(#golgiGrad)" stroke="#6b21a8" stroke-width="2.5" filter="url(#golgiShadow)"/>
+
+  <!-- Cisterna 4 -->
+  <path d="M 42,126 C 80,114 120,114 158,126 C 165,128 165,136 158,138 C 122,128 78,128 42,138 C 35,136 35,128 42,126 Z" 
+        fill="url(#golgiGrad)" stroke="#6b21a8" stroke-width="2.5" filter="url(#golgiShadow)"/>
+
+  <!-- Cisterna 5 (Trans face) -->
+  <path d="M 48,148 C 82,138 118,138 152,148 C 158,150 157,157 151,158 C 120,150 80,150 49,158 C 43,157 42,150 48,148 Z" 
+        fill="url(#golgiGrad)" stroke="#6b21a8" stroke-width="2.5" filter="url(#golgiShadow)"/>
+
+  <!-- Transport and Secretory Vesicles budding off -->
+  <circle cx="26" cy="74" r="8" fill="#c084fc" stroke="#7e22ce" stroke-width="2"/>
+  <circle cx="174" cy="70" r="9" fill="#c084fc" stroke="#7e22ce" stroke-width="2"/>
+  
+  <circle cx="22" cy="112" r="10" fill="#a855f7" stroke="#6b21a8" stroke-width="2"/>
+  <circle cx="178" cy="115" r="9.5" fill="#a855f7" stroke="#6b21a8" stroke-width="2"/>
+
+  <circle cx="32" cy="154" r="8" fill="#c084fc" stroke="#7e22ce" stroke-width="2"/>
+  <circle cx="168" cy="156" r="9" fill="#c084fc" stroke="#7e22ce" stroke-width="2"/>
+  
+  <circle cx="70" cy="172" r="7.5" fill="#d8b4fe" stroke="#7e22ce" stroke-width="2"/>
+  <circle cx="130" cy="174" r="8" fill="#d8b4fe" stroke="#7e22ce" stroke-width="2"/>
+  <circle cx="100" cy="180" r="6" fill="#e9d5ff" stroke="#7e22ce" stroke-width="1.5"/>
+</svg>
