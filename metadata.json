@@ -1,0 +1,8 @@
+{
+  "name": "Arrasta e Combina",
+  "description": "Crie widgets educacionais interativos de arrastar e soltar (com suporte a até 5 itens simultâneos) com feedback personalizado e exportação HTML.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
