@@ -212,7 +212,8 @@ function generateStandaloneHTML(config: WidgetConfig): string {
             </div>
         </div>
 
-        <!-- Success & Review Screen (Always safe in DOM, hidden until completion) -->
+        ${showSuccessMsg ? `
+        <!-- Success & Review Screen (Hidden until completion) -->
         <div id="success-screen" class="hidden bg-emerald-50 border border-emerald-100 p-6 rounded-2xl space-y-4 transition-all duration-500">
             <div class="flex items-center justify-between gap-3 flex-wrap sm:flex-nowrap">
                 <div class="flex items-center gap-3 min-w-0">
@@ -223,7 +224,7 @@ function generateStandaloneHTML(config: WidgetConfig): string {
                     </div>
                     <div class="min-w-0 flex-1">
                         <p class="text-sm text-emerald-900 font-semibold leading-relaxed" id="global-explanation">
-                            ${showSuccessMsg && config.globalExplanation ? config.globalExplanation : 'Parabéns! Você completou todas as correspondências corretamente!'}
+                            ${config.globalExplanation ? config.globalExplanation : 'Parabéns! Você completou todas as correspondências corretamente!'}
                         </p>
                     </div>
                 </div>
@@ -245,8 +246,8 @@ function generateStandaloneHTML(config: WidgetConfig): string {
             </div>
             ` : ''}
         </div>
-
-        <!-- Actions -->
+        ` : `
+        <!-- Actions below main board when success message is disabled -->
         <div class="flex items-center justify-end pt-3 border-t border-slate-100">
             <button type="button" onclick="resetQuiz()" class="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer bg-transparent border-0 py-1.5 px-3 rounded-lg hover:bg-slate-100" title="Reiniciar Atividade">
                 <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
@@ -258,6 +259,7 @@ function generateStandaloneHTML(config: WidgetConfig): string {
                 Reiniciar Atividade
             </button>
         </div>
+        `}
     </div>
 
     <script>
@@ -825,8 +827,7 @@ export default function App() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    const safeTitle = (config.title || 'arrasta-e-combina').toLowerCase().replace(/[^a-z0-9]+/g, '-');
-    a.download = `${safeTitle}.html`;
+    a.download = 'Arrasta_e_Combina.html';
     a.click();
     URL.revokeObjectURL(url);
     setIsExporting(false);
@@ -1506,9 +1507,9 @@ export default function App() {
 
                 </div>
 
-                {/* Congratulations section on completion */}
+                {/* Congratulations section on completion (only if showSuccessMsg is true) */}
                 <AnimatePresence>
-                  {isComplete && (
+                  {isComplete && showSuccessMsg && (
                     <motion.div 
                       key="success"
                       initial={{ opacity: 0, scale: 0.95 }}
@@ -1522,12 +1523,12 @@ export default function App() {
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-xs text-emerald-900 font-semibold leading-relaxed">
-                              {showSuccessMsg && config.globalExplanation ? config.globalExplanation : 'Parabéns! Atividade concluída com sucesso!'}
+                              {config.globalExplanation ? config.globalExplanation : 'Parabéns! Atividade concluída com sucesso!'}
                             </p>
                           </div>
                         </div>
 
-                        {/* Discreet grey restart button */}
+                        {/* Discreet grey restart button inside green box */}
                         <button
                           onClick={resetWidget}
                           className="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0 py-1 px-2 rounded-lg hover:bg-emerald-100/60"
@@ -1556,6 +1557,19 @@ export default function App() {
                     </motion.div>
                   )}
                 </AnimatePresence>
+
+                {/* When showSuccessMsg is false: Reiniciar Atividade below main board */}
+                {!showSuccessMsg && (
+                  <div className="flex items-center justify-end pt-3 border-t border-slate-100">
+                    <button
+                      onClick={resetWidget}
+                      className="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer py-1.5 px-3 rounded-lg hover:bg-slate-100"
+                      title="Reiniciar Atividade"
+                    >
+                      <RefreshCw size={12} /> Reiniciar Atividade
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </section>
@@ -1761,9 +1775,9 @@ export default function App() {
 
               </div>
 
-              {/* Completion block in Fullscreen */}
+              {/* Completion block in Fullscreen (only if showSuccessMsg is true) */}
               <AnimatePresence>
-                {isComplete && (
+                {isComplete && showSuccessMsg && (
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -1776,12 +1790,12 @@ export default function App() {
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm text-emerald-900 font-semibold leading-relaxed">
-                            {showSuccessMsg && config.globalExplanation ? config.globalExplanation : 'Parabéns! Atividade concluída com sucesso!'}
+                            {config.globalExplanation ? config.globalExplanation : 'Parabéns! Atividade concluída com sucesso!'}
                           </p>
                         </div>
                       </div>
 
-                      {/* Discreet grey restart button */}
+                      {/* Discreet grey restart button inside green box */}
                       <button
                         onClick={resetWidget}
                         className="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer flex-shrink-0 py-1.5 px-3 rounded-lg hover:bg-emerald-100/60"
@@ -1810,6 +1824,19 @@ export default function App() {
                   </motion.div>
                 )}
               </AnimatePresence>
+
+              {/* When showSuccessMsg is false: Reiniciar Atividade below main board in fullscreen */}
+              {!showSuccessMsg && (
+                <div className="flex items-center justify-end pt-3 border-t border-slate-100">
+                  <button
+                    onClick={resetWidget}
+                    className="text-xs font-bold text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors cursor-pointer py-1.5 px-3 rounded-lg hover:bg-slate-100"
+                    title="Reiniciar Atividade"
+                  >
+                    <RefreshCw size={13} /> Reiniciar Atividade
+                  </button>
+                </div>
+              )}
             </div>
           </motion.div>
         )}
