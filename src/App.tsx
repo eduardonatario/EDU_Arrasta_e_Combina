@@ -94,6 +94,9 @@ function generateStandaloneHTML(config: WidgetConfig): string {
   const showReview = config.showReview ?? false;
   const showProgressBar = config.showProgressBar ?? true;
 
+  // Safe serialized config preventing any script injection or tag break
+  const safeSerializedConfig = JSON.stringify(config).replace(/</g, '\\u003c');
+
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -103,11 +106,30 @@ function generateStandaloneHTML(config: WidgetConfig): string {
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+        * { box-sizing: border-box; }
         body { 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Inter', system-ui, -apple-system, sans-serif; 
             background-color: #f8fafc; 
             color: #1e293b;
             touch-action: pan-y;
+            margin: 0;
+            padding: 1rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .main-container {
+            max-width: 56rem;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            border: 1px solid #f1f5f9;
+            padding: 1.5rem;
+        }
+        @media (min-width: 640px) {
+            .main-container { padding: 2rem; }
         }
         .draggable { cursor: grab; user-select: none; -webkit-user-select: none; }
         .draggable:active { cursor: grabbing; }
@@ -145,10 +167,11 @@ function generateStandaloneHTML(config: WidgetConfig): string {
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.25), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
             transition: none;
         }
+        .hidden { display: none !important; }
     </style>
 </head>
 <body class="flex flex-col items-center justify-start min-h-screen p-4 sm:p-8">
-    <div class="max-w-4xl w-full bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8 space-y-6">
+    <div class="main-container space-y-6">
         ${(showTitle || showSubtitle) ? `
         <!-- Header -->
         <div class="text-center space-y-2 border-b border-slate-100 pb-4">
@@ -189,8 +212,7 @@ function generateStandaloneHTML(config: WidgetConfig): string {
             </div>
         </div>
 
-        ${showSuccessMsg ? `
-        <!-- Global Explanation and Success Screen -->
+        <!-- Success & Review Screen (Always safe in DOM, hidden until completion) -->
         <div id="success-screen" class="hidden bg-emerald-50 border border-emerald-100 p-6 rounded-2xl space-y-4 transition-all duration-500">
             <div class="flex items-center gap-3">
                 <div class="bg-emerald-500 text-white p-2 rounded-full shadow-md shadow-emerald-200 flex-shrink-0">
@@ -199,65 +221,77 @@ function generateStandaloneHTML(config: WidgetConfig): string {
                     </svg>
                 </div>
                 <div class="min-w-0 flex-1">
-                    <p class="text-sm text-emerald-900 font-semibold leading-relaxed" id="global-explanation"></p>
+                    <p class="text-sm text-emerald-900 font-semibold leading-relaxed" id="global-explanation">
+                        ${showSuccessMsg && config.globalExplanation ? config.globalExplanation : 'Parabéns! Você completou todas as correspondências corretamente!'}
+                    </p>
                 </div>
             </div>
             
             ${showReview ? `
-            <div class="space-y-2">
+            <div class="space-y-2 pt-1 border-t border-emerald-100/60">
                 <h4 class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Revisão Didática:</h4>
                 <div id="explanations-list" class="space-y-2"></div>
             </div>
             ` : ''}
         </div>
-        ` : ''}
 
         <!-- Actions -->
         <div class="flex items-center justify-between pt-4 border-t border-slate-100">
-            <button onclick="resetQuiz()" class="px-6 py-3 border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white hover:bg-slate-50 cursor-pointer shadow-xs">
+            <button type="button" onclick="resetQuiz()" class="px-6 py-3 border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-300 rounded-xl text-sm font-bold transition-all flex items-center justify-center gap-2 bg-white hover:bg-slate-50 cursor-pointer shadow-xs">
                 🔄 Reiniciar Atividade
             </button>
         </div>
     </div>
 
     <script>
-        const config = ${JSON.stringify(config)};
+        const config = ${safeSerializedConfig};
         let matchedIndices = [];
         let selectedItemIndex = null;
         let shuffledOrder = [];
         let activeHoverTarget = null;
         
         function initQuiz() {
-            matchedIndices = [];
-            selectedItemIndex = null;
-            activeHoverTarget = null;
-            
-            const titleEl = document.getElementById('quiz-title');
-            if (titleEl) titleEl.innerText = config.title || '';
+            try {
+                matchedIndices = [];
+                selectedItemIndex = null;
+                activeHoverTarget = null;
+                
+                const titleEl = document.getElementById('quiz-title');
+                if (titleEl) titleEl.innerText = config.title || '';
 
-            const subEl = document.getElementById('quiz-subtitle');
-            if (subEl) subEl.innerText = config.subtitle || '';
+                const subEl = document.getElementById('quiz-subtitle');
+                if (subEl) subEl.innerText = config.subtitle || '';
 
-            const globalExpEl = document.getElementById('global-explanation');
-            if (globalExpEl) globalExpEl.innerText = config.globalExplanation || '';
+                const globalExpEl = document.getElementById('global-explanation');
+                if (globalExpEl && config.globalExplanation) {
+                    globalExpEl.innerText = config.globalExplanation;
+                }
 
-            document.getElementById('success-screen').classList.add('hidden');
-            
-            // Generate shuffled index order
-            shuffledOrder = Array.from({length: config.items.length}, (_, i) => i);
-            shuffledOrder.sort(() => Math.random() - 0.5);
-            
-            renderDraggables();
-            renderTargets();
-            updateProgress();
+                const successScreen = document.getElementById('success-screen');
+                if (successScreen) {
+                    successScreen.classList.add('hidden');
+                }
+                
+                // Generate shuffled index order
+                shuffledOrder = Array.from({length: (config.items || []).length}, (_, i) => i);
+                shuffledOrder.sort(() => Math.random() - 0.5);
+                
+                renderDraggables();
+                renderTargets();
+                updateProgress();
+            } catch (err) {
+                console.error("Erro ao inicializar o quiz:", err);
+            }
         }
 
         function renderDraggables() {
             const container = document.getElementById('draggables-container');
+            if (!container) return;
             container.innerHTML = '';
             
             shuffledOrder.forEach((index) => {
                 const item = config.items[index];
+                if (!item) return;
                 const isMatched = matchedIndices.includes(index);
                 
                 if (isMatched) {
@@ -298,10 +332,10 @@ function generateStandaloneHTML(config: WidgetConfig): string {
                 
                 card.innerHTML = \`
                     <div class="bg-slate-50 p-1.5 rounded-xl flex-shrink-0 w-16 h-16 flex items-center justify-center border border-slate-100 overflow-hidden">
-                        <img src="\${item.sourceImageUrl}" class="w-full h-full object-contain pointer-events-none rounded-lg" alt="\${item.name}">
+                        <img src="\${item.sourceImageUrl}" class="w-full h-full object-contain pointer-events-none rounded-lg" alt="\${item.name || ''}">
                     </div>
                     <div class="flex-1 min-w-0">
-                        <p class="font-bold text-slate-800 text-sm truncate">\${item.name}</p>
+                        <p class="font-bold text-slate-800 text-sm truncate">\${item.name || ''}</p>
                         <p class="text-xs text-slate-400 mt-1 font-medium flex items-center gap-1">
                             ↔ Arraste ou clique o correspondente
                         </p>
@@ -364,7 +398,7 @@ function generateStandaloneHTML(config: WidgetConfig): string {
         }
 
         function findTargetAtPoint(x, y) {
-            for (let i = 0; i < config.items.length; i++) {
+            for (let i = 0; i < (config.items || []).length; i++) {
                 if (matchedIndices.includes(i)) continue;
                 const slot = document.getElementById(\`target-slot-\${i}\`);
                 if (slot) {
@@ -385,9 +419,10 @@ function generateStandaloneHTML(config: WidgetConfig): string {
 
         function renderTargets() {
             const container = document.getElementById('targets-container');
+            if (!container) return;
             container.innerHTML = '';
             
-            config.items.forEach((item, index) => {
+            (config.items || []).forEach((item, index) => {
                 const isMatched = matchedIndices.includes(index);
                 const shadowImg = item.targetImageUrl || item.sourceImageUrl;
                 
@@ -430,11 +465,11 @@ function generateStandaloneHTML(config: WidgetConfig): string {
                 if (isMatched) {
                     innerHtml = \`
                         <div class="w-16 h-16 rounded-xl overflow-hidden bg-white flex-shrink-0 border border-emerald-100 p-1 shadow-xs">
-                            <img src="\${item.sourceImageUrl}" class="w-full h-full object-contain rounded-lg" alt="\${item.name}">
+                            <img src="\${item.sourceImageUrl}" class="w-full h-full object-contain rounded-lg" alt="\${item.name || ''}">
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="font-bold text-emerald-900 text-sm">\${item.name}</p>
-                            <p class="text-xs text-emerald-700/80 mt-1 leading-relaxed font-medium">\${item.explanation}</p>
+                            <p class="font-bold text-emerald-900 text-sm">\${item.name || ''}</p>
+                            <p class="text-xs text-emerald-700/80 mt-1 leading-relaxed font-medium">\${item.explanation || ''}</p>
                         </div>
                         <div class="bg-emerald-500 text-white p-1 rounded-full flex-shrink-0 shadow-xs">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -445,11 +480,11 @@ function generateStandaloneHTML(config: WidgetConfig): string {
                 } else {
                     innerHtml = \`
                         <div class="w-16 h-16 rounded-xl bg-slate-100 flex-shrink-0 p-1 flex items-center justify-center relative overflow-hidden">
-                            <img src="\${shadowImg}" class="w-full h-full object-contain grayscale opacity-25 brightness-110 rounded-lg">
+                            <img src="\${shadowImg}" class="w-full h-full object-contain grayscale opacity-25 brightness-110 rounded-lg" alt="">
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="font-bold text-slate-400 text-sm tracking-tight">Solte ou clique verificar</p>
-                            <p class="text-xs text-slate-400 font-semibold truncate mt-0.5">\${item.name}</p>
+                            <p class="text-xs text-slate-400 font-semibold truncate mt-0.5">\${item.name || ''}</p>
                         </div>
                     \`;
                     if (selectedItemIndex !== null) {
@@ -516,36 +551,40 @@ function generateStandaloneHTML(config: WidgetConfig): string {
 
         function updateProgress() {
             const count = matchedIndices.length;
-            const total = config.items.length;
+            const total = (config.items || []).length;
             const bar = document.getElementById('progress-bar');
-            if (bar) {
+            if (bar && total > 0) {
                 bar.style.width = \`\${(count / total) * 100}%\`;
             }
         }
 
         function checkQuizComplete() {
-            if (matchedIndices.length === config.items.length) {
+            if (matchedIndices.length === (config.items || []).length && (config.items || []).length > 0) {
                 const success = document.getElementById('success-screen');
-                success.classList.remove('hidden');
-                
-                const list = document.getElementById('explanations-list');
-                if (list) {
-                    list.innerHTML = '';
-                    config.items.forEach(item => {
-                        const row = document.createElement('div');
-                        row.className = "bg-white p-3.5 rounded-xl border border-slate-100 flex items-start gap-3 shadow-xs";
-                        row.innerHTML = \`
-                            <img src="\${item.sourceImageUrl}" class="w-8 h-8 object-contain flex-shrink-0 mt-0.5 rounded-md" alt="">
-                            <div>
-                                <strong class="text-slate-800 font-bold">\${item.name}</strong>: 
-                                <span class="text-slate-600 font-medium text-xs leading-relaxed">\${item.explanation}</span>
-                            </div>
-                        \`;
-                        list.appendChild(row);
-                    });
+                if (success) {
+                    success.classList.remove('hidden');
+                    
+                    const list = document.getElementById('explanations-list');
+                    if (list) {
+                        list.innerHTML = '';
+                        (config.items || []).forEach(item => {
+                            const row = document.createElement('div');
+                            row.className = "bg-white p-3.5 rounded-xl border border-slate-100 flex items-start gap-3 shadow-xs";
+                            row.innerHTML = \`
+                                <img src="\${item.sourceImageUrl}" class="w-8 h-8 object-contain flex-shrink-0 mt-0.5 rounded-md" alt="">
+                                <div>
+                                    <strong class="text-slate-800 font-bold">\${item.name || ''}</strong>: 
+                                    <span class="text-slate-600 font-medium text-xs leading-relaxed">\${item.explanation || ''}</span>
+                                </div>
+                            \`;
+                            list.appendChild(row);
+                        });
+                    }
+                    
+                    try {
+                        success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } catch (e) {}
                 }
-                
-                success.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
         }
 
@@ -553,7 +592,18 @@ function generateStandaloneHTML(config: WidgetConfig): string {
             initQuiz();
         }
 
-        window.onload = initQuiz;
+        // Bulletproof startup: runs as soon as DOM is ready, plus fallback on load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initQuiz);
+        } else {
+            initQuiz();
+        }
+        window.addEventListener('load', () => {
+            const container = document.getElementById('draggables-container');
+            if (container && container.children.length === 0) {
+                initQuiz();
+            }
+        });
     </script>
 </body>
 </html>`;
@@ -1240,14 +1290,14 @@ export default function App() {
             </div>
           </section>
 
-          {/* Preview Section (Simulação do Aluno) */}
+          {/* Preview Section (Visualização rápida) */}
           <section className="order-1 lg:order-2 lg:sticky lg:top-24 space-y-4">
             <div className="flex items-center justify-between px-2">
               <div className="flex items-center gap-2">
                 <div className="bg-emerald-50 p-1.5 rounded-lg text-emerald-600">
                   <Eye size={16} />
                 </div>
-                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Simulação do Aluno</h3>
+                <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Visualização rápida</h3>
               </div>
               <div className="flex items-center gap-3">
                 <button 
