@@ -184,8 +184,7 @@ function generateStandaloneHTML(config: WidgetConfig): string {
         <!-- Touch Hint -->
         <div class="flex items-center justify-start text-xs text-slate-400 font-semibold px-2">
             <span class="flex items-center gap-1.5 bg-slate-50 px-3 py-1.5 rounded-full text-slate-600">
-                💡 <span class="hidden sm:inline">Arraste o item da esquerda para o correspondente na direita (ou use clique).</span>
-                <span class="sm:hidden">Toque em um item da esquerda e depois no correspondente da direita.</span>
+                💡 <span>Arraste o item da esquerda para o correspondente na direita (ou use clique).</span>
             </span>
         </div>
         ` : ''}
