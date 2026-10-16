@@ -530,7 +530,9 @@ function generateStandaloneHTML(config: WidgetConfig): string {
 
         function handleMatchAttempt(draggedIndex, targetIndex) {
             if (draggedIndex === targetIndex) {
-                matchedIndices.push(draggedIndex);
+                if (!matchedIndices.includes(draggedIndex)) {
+                    matchedIndices.push(draggedIndex);
+                }
                 selectedItemIndex = null;
                 
                 const targetSlot = document.getElementById(\`target-slot-\${targetIndex}\`);
@@ -796,7 +798,19 @@ export default function App() {
     if (config.items.length <= 2) return;
     const updatedItems = config.items.filter((_, idx) => idx !== index);
     setConfig({ ...config, items: updatedItems });
-    setExpandedItemIdx(Math.max(0, index - 1));
+    setExpandedItemIdx(prev => {
+      if (prev === null) return null;
+      if (prev === index) return null;
+      if (prev > index) return prev - 1;
+      return prev;
+    });
+    // Reset matching & drag states immediately
+    setMatchedIds([]);
+    setSelectedDraggable(null);
+    setHoveredTargetIndex(null);
+    setErrorTargetId(null);
+    targetRefs.current = [];
+    fullscreenTargetRefs.current = [];
   };
 
   const copyHTMLToClipboard = async () => {
@@ -1088,9 +1102,12 @@ export default function App() {
               {/* Items Accordion list */}
               <div className="space-y-4 pt-2">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1.5">
-                    🧩 Itens do Pareamento ({config.items.length})
-                  </h3>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                      🧩 Itens do Pareamento ({config.items.length}/8)
+                    </h3>
+                    <p className="text-[10px] text-slate-400 font-medium">Mínimo: 2 itens | Máximo: 8 itens</p>
+                  </div>
                   <button
                     onClick={addItem}
                     disabled={config.items.length >= 8}
@@ -1127,16 +1144,22 @@ export default function App() {
                           
                           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                             <button
+                              type="button"
                               onClick={() => removeItem(index)}
                               disabled={config.items.length <= 2}
-                              className="text-slate-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-red-50 disabled:opacity-30 transition-all cursor-pointer"
-                              title="Remover item"
+                              className={`p-1.5 rounded-lg transition-all ${
+                                config.items.length <= 2
+                                  ? 'text-slate-300 opacity-40 cursor-not-allowed'
+                                  : 'text-slate-400 hover:text-red-500 hover:bg-red-50 cursor-pointer'
+                              }`}
+                              title={config.items.length <= 2 ? "Mínimo de 2 itens obrigatório para o quiz" : "Remover item"}
                             >
                               <Trash2 size={13} />
                             </button>
                             <button
+                              type="button"
                               onClick={() => setExpandedItemIdx(isExpanded ? null : index)}
-                              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition-all"
+                              className="text-slate-400 hover:text-slate-600 p-1 rounded-lg transition-all cursor-pointer"
                             >
                               {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                             </button>
@@ -1294,6 +1317,29 @@ export default function App() {
                                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 focus:border-blue-500 focus:bg-white rounded-xl outline-none resize-none"
                                     placeholder="Explique o que esta organela faz. Será exibido ao aluno ao realizar a correspondência."
                                   />
+                                </div>
+
+                                {/* Remove item footer action */}
+                                <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
+                                  <span className="text-[11px] text-slate-400">
+                                    {config.items.length <= 2 
+                                      ? 'Mínimo de 2 itens obrigatório para o quiz.' 
+                                      : 'Ao remover, o item é excluído da atividade e do HTML.'}
+                                  </span>
+                                  <button
+                                    type="button"
+                                    onClick={() => removeItem(index)}
+                                    disabled={config.items.length <= 2}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                                      config.items.length <= 2
+                                        ? 'opacity-30 cursor-not-allowed text-slate-400 bg-slate-100'
+                                        : 'text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 cursor-pointer shadow-2xs'
+                                    }`}
+                                    title={config.items.length <= 2 ? 'Mínimo de 2 itens necessários' : 'Remover este item'}
+                                  >
+                                    <Trash2 size={13} />
+                                    Remover Item
+                                  </button>
                                 </div>
                               </div>
                             </motion.div>
