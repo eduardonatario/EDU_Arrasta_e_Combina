@@ -806,9 +806,21 @@ export default function App() {
     setErrorTargetId(null);
   };
 
-  const removeItem = (index: number) => {
+  const removeItem = (targetIdOrIndex: string | number) => {
     if (config.items.length <= 2) return;
-    const updatedItems = config.items.filter((_, idx) => idx !== index);
+    
+    let targetIndex: number;
+    let updatedItems: ItemConfig[];
+    
+    if (typeof targetIdOrIndex === 'string') {
+      targetIndex = config.items.findIndex(item => item.id === targetIdOrIndex);
+      if (targetIndex === -1) return;
+      updatedItems = config.items.filter(item => item.id !== targetIdOrIndex);
+    } else {
+      targetIndex = targetIdOrIndex;
+      if (targetIndex < 0 || targetIndex >= config.items.length) return;
+      updatedItems = config.items.filter((_, idx) => idx !== targetIndex);
+    }
     
     // Synchronously update shuffled indices within safe bounds
     setShuffledIndices(getShuffledIndices(updatedItems.length));
@@ -816,8 +828,8 @@ export default function App() {
     setConfig({ ...config, items: updatedItems });
     setExpandedItemIdx(prev => {
       if (prev === null) return null;
-      if (prev === index) return null;
-      if (prev > index) return prev - 1;
+      if (prev === targetIndex) return null;
+      if (prev > targetIndex) return prev - 1;
       return prev;
     });
     setGalleryTarget(null);
@@ -1162,7 +1174,10 @@ export default function App() {
                           <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                             <button
                               type="button"
-                              onClick={() => removeItem(index)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeItem(item.id);
+                              }}
                               disabled={config.items.length <= 2}
                               className={`p-1.5 rounded-lg transition-all ${
                                 config.items.length <= 2
@@ -1345,7 +1360,7 @@ export default function App() {
                                   </span>
                                   <button
                                     type="button"
-                                    onClick={() => removeItem(index)}
+                                    onClick={() => removeItem(item.id)}
                                     disabled={config.items.length <= 2}
                                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                                       config.items.length <= 2
