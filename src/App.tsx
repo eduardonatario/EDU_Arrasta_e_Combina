@@ -629,10 +629,22 @@ function generateStandaloneHTML(config: WidgetConfig): string {
 </html>`;
 }
 
+// Helper to generate Fisher-Yates shuffled indices
+const getShuffledIndices = (length: number): number[] => {
+  const indices = Array.from({ length }, (_, i) => i);
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  return indices;
+};
+
 export default function App() {
   const [config, setConfig] = useState<WidgetConfig>(DEFAULT_ORGANELAS_CONFIG);
   const [matchedIds, setMatchedIds] = useState<number[]>([]);
-  const [shuffledIndices, setShuffledIndices] = useState<number[]>([]);
+  const [shuffledIndices, setShuffledIndices] = useState<number[]>(() =>
+    getShuffledIndices(DEFAULT_ORGANELAS_CONFIG.items.length)
+  );
   const [selectedDraggable, setSelectedDraggable] = useState<number | null>(null);
   const [hoveredTargetIndex, setHoveredTargetIndex] = useState<number | null>(null);
   const [errorTargetId, setErrorTargetId] = useState<number | null>(null);
@@ -675,13 +687,7 @@ export default function App() {
 
   // Shuffles cards whenever quiz is reset or component amount changes
   useEffect(() => {
-    const indices = Array.from({ length: config.items.length }, (_, i) => i);
-    // Fisher-Yates shuffle
-    for (let i = indices.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [indices[i], indices[j]] = [indices[j], indices[i]];
-    }
-    setShuffledIndices(indices);
+    setShuffledIndices(getShuffledIndices(config.items.length));
     setMatchedIds([]);
     setSelectedDraggable(null);
     setHoveredTargetIndex(null);
@@ -790,13 +796,23 @@ export default function App() {
       sourceImageUrl: unusedPreset ? unusedPreset.svgDataUri : MITOCONDRIA_SVG,
       explanation: unusedPreset ? unusedPreset.defaultExplanation : 'Insira a explicação pedagógica sobre a função desta estrutura celular aqui.'
     };
-    setConfig({ ...config, items: [...config.items, newItem] });
+    const updatedItems = [...config.items, newItem];
+    setShuffledIndices(getShuffledIndices(updatedItems.length));
+    setConfig({ ...config, items: updatedItems });
     setExpandedItemIdx(newIdx);
+    setMatchedIds([]);
+    setSelectedDraggable(null);
+    setHoveredTargetIndex(null);
+    setErrorTargetId(null);
   };
 
   const removeItem = (index: number) => {
     if (config.items.length <= 2) return;
     const updatedItems = config.items.filter((_, idx) => idx !== index);
+    
+    // Synchronously update shuffled indices within safe bounds
+    setShuffledIndices(getShuffledIndices(updatedItems.length));
+    
     setConfig({ ...config, items: updatedItems });
     setExpandedItemIdx(prev => {
       if (prev === null) return null;
@@ -804,6 +820,7 @@ export default function App() {
       if (prev > index) return prev - 1;
       return prev;
     });
+    setGalleryTarget(null);
     // Reset matching & drag states immediately
     setMatchedIds([]);
     setSelectedDraggable(null);
@@ -1430,6 +1447,7 @@ export default function App() {
                     <p className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider px-1">Itens de Arrastar</p>
                     {shuffledIndices.map((idx) => {
                       const item = config.items[idx];
+                      if (!item) return null;
                       const isMatched = matchedIds.includes(idx);
                       const isSelected = selectedDraggable === idx;
 
@@ -1705,6 +1723,7 @@ export default function App() {
                   <div className="space-y-3">
                     {shuffledIndices.map((idx) => {
                       const item = config.items[idx];
+                      if (!item) return null;
                       const isMatched = matchedIds.includes(idx);
                       const isSelected = selectedDraggable === idx;
 
